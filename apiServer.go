@@ -44,6 +44,7 @@ func (server *ApiServer) run() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/todo", handlerFunc(server.handleTodo))
+	router.HandleFunc("/todo/{id}", handlerFunc(server.handleTodoWithID))
 
 	err := http.ListenAndServe(server.ListenAddress, router)
 	if err != nil {
@@ -64,17 +65,40 @@ func (server *ApiServer) handleTodo(w http.ResponseWriter, r *http.Request) erro
 	return fmt.Errorf("method not allowed")
 }
 
+func (server *ApiServer) handleTodoWithID(w http.ResponseWriter, r *http.Request) error {
+	if r.Method == "GET" {
+		return server.handleGetIdTodo(w, r)
+	}
+	if r.Method == "DELETE" {
+		return server.handleDeleteTodo(w, r)
+	}
+	return fmt.Errorf("method not allowed")
+}
+
 func (server *ApiServer) handleGetTodo(w http.ResponseWriter, r *http.Request) error {
-	todos, err := server.storage.getTodo()
+	todos, err := server.storage.getTodos()
 	if err != nil {
 		return err
 	}
 	return WriteJSON(w, http.StatusOK, todos)
 }
 
+func (server *ApiServer) handleGetIdTodo(w http.ResponseWriter, r *http.Request) error {
+	id := mux.Vars(r)["id"]
+	todo, err := server.storage.getTodo(id)
+	if err != nil {
+		return err
+	}
+	return WriteJSON(w, http.StatusOK, todo)
+}
+
 func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
-	//todo
-	return nil
+	id := mux.Vars(r)["id"]
+	err := server.storage.deleteTodo(id)
+	if err != nil {
+		return err
+	}
+	return WriteJSON(w, http.StatusOK, "deleted")
 }
 
 func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
@@ -84,7 +108,7 @@ func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request
 	}
 
 	todo := NewTodo(todoNewRequest.Title, todoNewRequest.Description)
-	if err := server.storage.postConn(todo); err != nil {
+	if err := server.storage.postTodo(todo); err != nil {
 		return err
 	}
 

@@ -12,7 +12,7 @@ func newDbConn(conn *sql.DB) *dbConn {
 	}
 }
 
-func (conn *dbConn) getTodo() ([]*Todo, error) {
+func (conn *dbConn) getTodos() ([]*Todo, error) {
 	var todos []*Todo
 	res, err := conn.db.Query("SELECT * FROM todo")
 	if err != nil {
@@ -29,7 +29,7 @@ func (conn *dbConn) getTodo() ([]*Todo, error) {
 	return todos, nil
 }
 
-func (conn *dbConn) postConn(todo *Todo) error {
+func (conn *dbConn) postTodo(todo *Todo) error {
 	query := `insert into Todo(description, title) values (?, ?)`
 
 	_, err := conn.db.Query(query, todo.Title, todo.Description)
@@ -37,5 +37,32 @@ func (conn *dbConn) postConn(todo *Todo) error {
 		return err
 	}
 
+	return nil
+
+}
+
+func (conn *dbConn) getTodo(ID string) (*Todo, error) {
+	query := `select * from Todo where id = ?`
+	res, err := conn.db.Query(query, ID)
+	todo := new(Todo)
+	if err != nil {
+		return nil, err
+	}
+	for res.Next() {
+		err := res.Scan(&todo.ID, &todo.Title, &todo.Description)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+	return todo, nil
+}
+
+func (conn *dbConn) deleteTodo(ID string) error {
+	query := `delete from Todo where id = ?`
+
+	_, err := conn.db.Query(query, ID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
