@@ -1,8 +1,8 @@
 package api
 
 import (
-	"APItry/storage"
 	"database/sql"
+	"github.com/BananaPilot/sample-api/storage"
 )
 
 type dbConn struct {

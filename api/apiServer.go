@@ -1,9 +1,9 @@
 package api
 
 import (
-	"APItry/storage"
 	"encoding/json"
 	"fmt"
+	"github.com/BananaPilot/sample-api/storage"
 	"github.com/gorilla/mux"
 	"net/http"
 )

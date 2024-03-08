@@ -1,8 +1,8 @@
 package main
 
 import (
-	"APItry/api"
-	"APItry/storage"
+	"github.com/BananaPilot/sample-api/api"
+	"github.com/BananaPilot/sample-api/storage"
 )
 
 func main() {
