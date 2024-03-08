@@ -1,25 +1,28 @@
-package main
+package api
 
-import "database/sql"
+import (
+	"APItry/storage"
+	"database/sql"
+)
 
 type dbConn struct {
 	db *sql.DB
 }
 
-func newDbConn(conn *sql.DB) *dbConn {
+func NewDbConn(conn *sql.DB) *dbConn {
 	return &dbConn{
 		db: conn,
 	}
 }
 
-func (conn *dbConn) getTodos() ([]*Todo, error) {
-	var todos []*Todo
+func (conn *dbConn) getTodos() ([]*storage.Todo, error) {
+	var todos []*storage.Todo
 	res, err := conn.db.Query("SELECT * FROM todo")
 	if err != nil {
 		panic(err.Error())
 	}
 	for res.Next() {
-		todo := new(Todo)
+		todo := new(storage.Todo)
 		err := res.Scan(&todo.ID, &todo.Title, &todo.Description)
 		if err != nil {
 			panic(err.Error())
@@ -29,7 +32,7 @@ func (conn *dbConn) getTodos() ([]*Todo, error) {
 	return todos, nil
 }
 
-func (conn *dbConn) postTodo(todo *Todo) error {
+func (conn *dbConn) postTodo(todo *storage.Todo) error {
 	query := `insert into Todo(description, title) values (?, ?)`
 
 	_, err := conn.db.Query(query, todo.Title, todo.Description)
@@ -41,10 +44,10 @@ func (conn *dbConn) postTodo(todo *Todo) error {
 
 }
 
-func (conn *dbConn) getTodo(ID string) (*Todo, error) {
+func (conn *dbConn) getTodo(ID string) (*storage.Todo, error) {
 	query := `select * from Todo where id = ?`
 	res, err := conn.db.Query(query, ID)
-	todo := new(Todo)
+	todo := new(storage.Todo)
 	if err != nil {
 		return nil, err
 	}

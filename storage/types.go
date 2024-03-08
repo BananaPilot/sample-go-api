@@ -1,4 +1,4 @@
-package main
+package storage
 
 type TodoNewRequest struct {
 	Title       string `json:"title"`

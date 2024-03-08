@@ -1,6 +1,7 @@
-package main
+package api
 
 import (
+	"APItry/storage"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -39,7 +40,7 @@ type ApiError struct {
 	Error error
 }
 
-func (server *ApiServer) run() {
+func (server *ApiServer) Run() {
 
 	router := mux.NewRouter()
 
@@ -102,12 +103,12 @@ func (server *ApiServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request
 }
 
 func (server *ApiServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
-	todoNewRequest := new(TodoNewRequest)
+	todoNewRequest := new(storage.TodoNewRequest)
 	if err := json.NewDecoder(r.Body).Decode(todoNewRequest); err != nil {
 		return err
 	}
 
-	todo := NewTodo(todoNewRequest.Title, todoNewRequest.Description)
+	todo := storage.NewTodo(todoNewRequest.Title, todoNewRequest.Description)
 	if err := server.storage.postTodo(todo); err != nil {
 		return err
 	}
